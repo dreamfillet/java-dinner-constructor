@@ -6,53 +6,55 @@ import java.util.Random;
 
 public class DinnerConstructor {
 
-    HashMap<?, ?> dinnersByType = ??? // хранилище блюд: ключ — тип блюда (например, "Суп"), значение — список названий блюд этого типа
-    Random random = new Random(); //этот вспомогательный класс поможет сделать произвольные сочетания блюд
+    HashMap<String, ArrayList<String>> dinnersByType = new HashMap<>();
 
-    //в этом методе мы добавляем компонент в подборку
+    Random random = new Random();
+
     public void addNewDish(String dishType, String dishName) {
-        ??? dishesForType; //переменая для списка блюд
-        if (dinnersByType.???(dishType)) { //здесь мы должны проверить, содержит ли наше хранилище такое блюдо
-            dishesForType = ??//если мы уже работали с этим типом - используем существующий список
+        ArrayList<String> dishesForType;
+        if (dinnersByType.containsKey(dishType)) {
+            dishesForType = dinnersByType.get(dishType);
         } else {
-            dishesForType = //для нового типа блюд создаём пустой список компонентов.
-            dinnersByType.???(dishType, dishesForType); //запоминаем новый список в хранилище
+            dishesForType = new ArrayList<>();
+            dinnersByType.put(dishType, dishesForType);
         }
-
-        dishesForType.???(dishName); //независимо от того, новый это список или существующий - добавим в него конкретное блюдо
+        dishesForType.add(dishName);
     }
 
-    //метод для генерирования вариантов комбинации блюд
+
     public ArrayList<ArrayList<String>> generateCombos(int comboNumber, ArrayList<String> dishTypes) {
-        ??? combos = ??? //пустой список для хранения получившихся комбинаций блюд
-        for (???; i <= comboNumber; ???) {
-            ??? combo = generateCombo(dishTypes); //одна комбинация блюд генерируется в отдельном методе
+        ArrayList<ArrayList<String>> combos = new ArrayList<>();
+        for (int i = 1; i <= comboNumber; i++) {
+            ArrayList<String> combo = generateCombo(dishTypes);
             combos.add(combo);
         }
         return combos;
     }
 
 
-    //метод для проверки дубликатов блюд
-    public boolean checkType(String type) {
-        return dinnersByType.???(type); //если хранилище уже содержит такое блюдо - вернём true
-    }
-
-    //метод для генерирования одной комбинации блюд
-    private ??? ***(??? dishTypes) {
-        ??? selectedDishes = ???;
-        for (??? dishType: dishTypes) {
-            ??? availableDishes = dinnersByType.???(dishType); //достаём из хранилища варианты блюд по типу
-            String selectedDish = ???(availableDishes); //полцчим произвольное блюдо
-            selectedDishes.???(selectedDish); //добавим блюдо в подборку комбинацию
+    private ArrayList<String> generateCombo(ArrayList<String> dishTypes) {
+        ArrayList<String> selectedDishes = new ArrayList<>();
+        for (String dishType : dishTypes) {
+            ArrayList<String> availableDishes = dinnersByType.get(dishType);
+            if (availableDishes == null || availableDishes.isEmpty()) {
+                throw new IllegalArgumentException("Нет блюд для типа: " + dishType);
+            }
+            String selectedDish = getRandomDish(availableDishes);
+            selectedDishes.add(selectedDish);
         }
         return selectedDishes;
     }
 
-    private String getRandomDish(??? availableDishes) {
-        int numberOfDishesForType = availableDishes.size(); //получаем общее количество доступных блюд этого типа
-        int dishIndex = random.nextInt(numberOfDishesForType); //генерируем случайное число от 0 до (кол-во блюд - 1), чтобы выбрать случайное блюдо
-        String selectedDish = availableDishes.???(dishIndex); //выберем произвольное блюдо по индексу
+    public boolean checkType(String type) {
+        //return dinnersByType.get(type) != null && dinnersByType.containsKey(type);
+        return dinnersByType.containsKey(type);
+    }
+
+    private String getRandomDish(ArrayList<String> availableDishes) {
+        int numberOfDishesForType = availableDishes.size();
+        int dishIndex = random.nextInt(numberOfDishesForType);
+        String selectedDish = availableDishes.get(dishIndex);
+        return selectedDish;
     }
 
 }
